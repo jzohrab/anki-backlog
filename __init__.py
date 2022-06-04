@@ -4,20 +4,34 @@ from aqt import mw
 from aqt.utils import showInfo, qconnect
 # import all of the Qt GUI library
 from aqt.qt import *
+from aqt import gui_hooks
 
-# We're going to add a menu item below. First we want to create a function to
-# be called when the menu item is activated.
+import logging
+import os
 
-def testFunction() -> None:
-    # get the number of cards in the current collection, which is stored in
-    # the main window
-    cardCount = mw.col.cardCount()
-    # show a message box
-    showInfo("Card count: %d" % cardCount)
+logging.basicConfig(
+    level=logging.DEBUG,
+    filename=f'{os.path.expanduser("~")}/anki-backlog.log',
+    format='%(asctime)s %(message)s'
+)
+logger = logging.getLogger(__file__)
+logger.setLevel(logging.DEBUG)
 
-# create a new menu item, "test"
-action = QAction("test", mw)
-# set it to call testFunction when it's clicked
-qconnect(action.triggered, testFunction)
-# and add it to the tools menu
-mw.form.menuTools.addAction(action)
+def backlogDue() -> None:
+    logger.debug('backlogging due cards')
+    # TODO
+
+def releaseBacklogBatch() -> None:
+    logger.debug('Releasing backlog')
+    # TODO
+
+logger.debug('Adding menus')
+
+menus = [
+    ['Backlog due cards', backlogDue],
+    ['Release backlog batch', releaseBacklogBatch]
+]
+for m in menus:
+    action = QAction(m[0], mw)
+    qconnect(action.triggered, m[1])
+    mw.form.menuTools.addAction(action)
