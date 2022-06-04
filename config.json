@@ -1,0 +1,9 @@
+{
+  "backlog_tag": "backlog",
+  "decks":{
+    "deck_name": {
+      "batch_size": 10,
+      "auto_release": true
+    }
+  }
+}
