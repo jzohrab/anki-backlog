@@ -41,10 +41,24 @@ def backlogDue() -> None:
 
 def releaseBacklogBatch() -> None:
     logger.debug('Releasing backlog')
-    # TODO
+    deckname = 'Spanish::03\_Spanish\_audio'
+    search = f"deck:{deckname} is:suspended tag:{BACKLOGTAG}"
+    col = mw.col
+    ids = col.find_cards(search)
+    logger.debug(f'Found {len(ids)} cards in backlog')
+    cards = [mw.col.get_card(i) for i in ids]
+    cards = cards[0:BATCHSIZE]
+    logger.debug(f'Releasing {len(cards)} from backlog')
+    cards.sort(key=lambda c: c.ivl, reverse=True)
+    for c in cards:
+        n = c.note()
+        n.remove_tag(BACKLOGTAG)
+        col.update_note(n)
+        c.queue = c.type
+        col.update_card(c)
+
 
 logger.debug('Adding menus')
-
 menus = [
     ['Backlog due cards', backlogDue],
     ['Release backlog batch', releaseBacklogBatch]
