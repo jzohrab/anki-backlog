@@ -20,6 +20,3 @@ Each have plusses and minuses.  If you select "oldest", your newer cards might g
 ## `release-size`
 
 The number of cards to be released.
-
-# A full example:
-
