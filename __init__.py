@@ -18,7 +18,7 @@ logging.basicConfig(
     format='%(asctime)s %(message)s'
 )
 logger = logging.getLogger(__file__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.CRITICAL)
 
 
 config = mw.addonManager.getConfig(__name__)
