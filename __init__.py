@@ -1,16 +1,13 @@
 from aqt import mw
 import aqt.utils
 from aqt.qt import *
-
 import aqt.operations.scheduling as opssched
 import aqt.operations.tag as opstag
 
-# Queue types
-BACKLOGTAG = 'backlog'
-BATCHSIZE = 10
-
 import logging
 import os
+
+BACKLOGTAG = 'backlog'
 
 logging.basicConfig(
     level=logging.DEBUG,
