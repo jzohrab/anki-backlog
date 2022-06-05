@@ -5,9 +5,9 @@ This add-on adds a few nice-to-have items to the tools menu:
 | Tools menu entry | Action |
 | --- | --- |
 | "Backlog due cards" | Suspend all due cards in the decks this add-on helps manage, and tag as "backlog". |
-| "Release backlog batch" | Unsuspend cards tagged with "backlog", starting with the oldest cards first. |
+| "Release backlog batch" | Unsuspend cards tagged with "backlog". |
 
-The decks managed by the add-on, and the size of each backlog release batch, are configured in the add-on config.
+The decks managed by the add-on, the size of each backlog release batch, and the backlog release order, are configured in the add-on config.
 
 ## Install
 
