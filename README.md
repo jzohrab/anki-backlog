@@ -20,6 +20,8 @@ In the add-on config, Tools > Add-Ons, select this add-on and click "Config".  S
 
 # Development
 
+## Local deploy
+
 I do development in a folder outside of Anki AddOns, and then I "deploy" (copy) the code to the addons folder.
 
 To do so (at least on a Mac):
@@ -36,3 +38,11 @@ Run the deployment script from root:
 ```
 $ ./deploy/deploy.sh
 ```
+
+## Releasing
+
+On Mac:
+
+Run `./zipping.sh`
+
+Ref https://addon-docs.ankiweb.net/sharing.html re sharing the zip.

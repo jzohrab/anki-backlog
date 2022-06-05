@@ -1,7 +1,10 @@
 ##########################
 
-# Configs
+# Configs.
 deploy/deploy.config
+
+# Zipfiles to be released.
+*.zip
 
 ##########################
 # Standard python ignores.
