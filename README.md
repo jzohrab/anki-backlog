@@ -1,5 +1,7 @@
 # Anki backlog management add-on.
 
+Add-on: https://ankiweb.net/shared/info/1480367353
+
 This add-on adds a few nice-to-have items to the tools menu:
 
 | Tools menu entry | Action |
@@ -41,8 +43,16 @@ $ ./deploy/deploy.sh
 
 ## Releasing
 
+Ref https://addon-docs.ankiweb.net/sharing.html re sharing the zip.
+
 On Mac:
 
 Run `./zipping.sh`
 
-Ref https://addon-docs.ankiweb.net/sharing.html re sharing the zip.
+Upload the .zip file to https://ankiweb.net/shared/info/1480367353
+
+
+# Change log:
+
+* 2022-06-05: Handle deck names with spaces.
+* 2022-06-04: Initial release
