@@ -28,7 +28,7 @@ def backlogDue() -> None:
 
     def get_ids(hsh):
         deckname = hsh['deck']
-        search = f"deck:{deckname} is:due -is:suspended"
+        search = f"\"deck:{deckname}\" is:due -is:suspended"
         scids = mw.col.find_cards(search)
         snids = mw.col.find_notes(search)
         logger.debug(f'{search} => {len(scids)} cards, {len(snids)} notes')
@@ -61,7 +61,7 @@ def releaseBacklogBatch() -> None:
         batchsize = hsh['release-size']
         sortdesc = hsh['release-by'] == 'oldest'
 
-        search = f"deck:{deckname} is:suspended tag:{BACKLOGTAG}"
+        search = f"\"deck:{deckname}\" is:suspended tag:{BACKLOGTAG}"
         ids = mw.col.find_cards(search)
         logger.debug(f'Found {len(ids)} cards in backlog')
         cards = [mw.col.get_card(i) for i in ids]
