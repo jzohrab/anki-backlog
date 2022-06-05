@@ -21,17 +21,33 @@ logger = logging.getLogger(__file__)
 logger.setLevel(logging.DEBUG)
 
 
+config = mw.addonManager.getConfig(__name__)
+decks = config['decks']
+logger.debug(decks)
+
+
 def backlogDue() -> None:
     logger.info('backlogging due cards')
-    deckname = 'Spanish::03\_Spanish\_audio'
-    search = f"deck:{deckname} is:due -is:suspended"
-    col = mw.col
-    ids = col.find_cards(search)
-    nids = col.find_notes(search)
-    logger.debug(f'Suspending {len(ids)} cards, tagging {len(nids)} notes')
+
+    def get_ids(hsh):
+        deckname = hsh['deck']
+        search = f"deck:{deckname} is:due -is:suspended"
+        scids = mw.col.find_cards(search)
+        snids = mw.col.find_notes(search)
+        logger.debug(f'{search} => {len(scids)} cards, {len(snids)} notes')
+        return { 'cids': scids, 'nids': snids }
+
+    cids = []
+    nids = []
+    for hsh in decks:
+        r = get_ids(hsh)
+        cids += r['cids']
+        nids += r['nids']
+
+    logger.debug(f'Suspending {len(cids)} cards, tagging {len(nids)} notes')
     opssched.suspend_cards(
         parent = mw,
-        card_ids = ids
+        card_ids = cids
     ).run_in_background()
     opstag.add_tags_to_notes(
         parent = mw,
@@ -42,21 +58,35 @@ def backlogDue() -> None:
 
 def releaseBacklogBatch() -> None:
     logger.debug('Releasing backlog')
-    deckname = 'Spanish::03\_Spanish\_audio'
-    search = f"deck:{deckname} is:suspended tag:{BACKLOGTAG}"
-    ids = mw.col.find_cards(search)
 
-    logger.debug(f'Found {len(ids)} cards in backlog')
-    cards = [mw.col.get_card(i) for i in ids]
-    cards.sort(key=lambda c: c.ivl, reverse=True)
-    cards = cards[0:BATCHSIZE]
-    ids = [c.id for c in cards]
-    nids = [c.note().id for c in cards]
+    def get_ids(hsh):
+        deckname = hsh['deck']
+        batchsize = hsh['release-size']
+        sortdesc = hsh['release-by'] == 'oldest'
 
-    logger.debug(f'Unsuspending {len(ids)} cards, untagging {len(nids)} notes')
+        search = f"deck:{deckname} is:suspended tag:{BACKLOGTAG}"
+        ids = mw.col.find_cards(search)
+        logger.debug(f'Found {len(ids)} cards in backlog')
+        cards = [mw.col.get_card(i) for i in ids]
+        cards.sort(key=lambda c: c.ivl, reverse=sortdesc)
+        cards = cards[0:batchsize]
+        scids = [c.id for c in cards]
+        snids = [c.note().id for c in cards]
+
+        logger.debug(f'{search} => {len(scids)} cards, {len(snids)} notes')
+        return { 'cids': scids, 'nids': snids }
+
+    cids = []
+    nids = []
+    for hsh in decks:
+        r = get_ids(hsh)
+        cids += r['cids']
+        nids += r['nids']
+
+    logger.debug(f'Unsuspending {len(cids)} cards, untagging {len(nids)} notes')
     opssched.unsuspend_cards(
         parent = mw,
-        card_ids = ids
+        card_ids = cids
     ).run_in_background()
     opstag.remove_tags_from_notes(
         parent = mw,
