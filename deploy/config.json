@@ -1,12 +1,12 @@
 {
   "decks": [
     {
-      "deck": "deck_1_name_as_used_in_browser_search",
+      "deck": "Spanish::01\\_Spanish\\_Vocab",
       "release-by": "oldest",
       "release-size": 10
     },
     {
-      "deck": "deck_2",
+      "deck": "Spanish::01\\_Spanish\\_audio",
       "release-by": "newest",
       "release-size": 20
     }
