@@ -1,13 +1,11 @@
-# import the main window object (mw) from aqt
 from aqt import mw
-# import the "show info" tool from utils.py
-from aqt.utils import showInfo, qconnect
-# import all of the Qt GUI library
+import aqt.utils
 from aqt.qt import *
-from aqt import gui_hooks
+
+import aqt.operations.scheduling as opssched
+import aqt.operations.tag as opstag
 
 # Queue types
-QUEUE_SUSPENDED = -1
 BACKLOGTAG = 'backlog'
 BATCHSIZE = 10
 
@@ -22,40 +20,49 @@ logging.basicConfig(
 logger = logging.getLogger(__file__)
 logger.setLevel(logging.DEBUG)
 
+
 def backlogDue() -> None:
     logger.info('backlogging due cards')
     deckname = 'Spanish::03\_Spanish\_audio'
     search = f"deck:{deckname} is:due -is:suspended"
     col = mw.col
     ids = col.find_cards(search)
-    logger.debug(f'Found {len(ids)} cards to backlog')
-    for i in ids:
-        c = mw.col.get_card(i)
-        n = c.note()
-        n.add_tag(BACKLOGTAG)
-        col.update_note(n)
-        c.queue = QUEUE_SUSPENDED
-        col.update_card(c)
+    nids = col.find_notes(search)
+    logger.debug(f'Suspending {len(ids)} cards, tagging {len(nids)} notes')
+    opssched.suspend_cards(
+        parent = mw,
+        card_ids = ids
+    ).run_in_background()
+    opstag.add_tags_to_notes(
+        parent = mw,
+        note_ids = nids,
+        space_separated_tags = BACKLOGTAG
+    ).run_in_background()
 
-    # TODO
 
 def releaseBacklogBatch() -> None:
     logger.debug('Releasing backlog')
     deckname = 'Spanish::03\_Spanish\_audio'
     search = f"deck:{deckname} is:suspended tag:{BACKLOGTAG}"
-    col = mw.col
-    ids = col.find_cards(search)
+    ids = mw.col.find_cards(search)
+
     logger.debug(f'Found {len(ids)} cards in backlog')
     cards = [mw.col.get_card(i) for i in ids]
-    cards = cards[0:BATCHSIZE]
-    logger.debug(f'Releasing {len(cards)} from backlog')
     cards.sort(key=lambda c: c.ivl, reverse=True)
-    for c in cards:
-        n = c.note()
-        n.remove_tag(BACKLOGTAG)
-        col.update_note(n)
-        c.queue = c.type
-        col.update_card(c)
+    cards = cards[0:BATCHSIZE]
+    ids = [c.id for c in cards]
+    nids = [c.note().id for c in cards]
+
+    logger.debug(f'Unsuspending {len(ids)} cards, untagging {len(nids)} notes')
+    opssched.unsuspend_cards(
+        parent = mw,
+        card_ids = ids
+    ).run_in_background()
+    opstag.remove_tags_from_notes(
+        parent = mw,
+        note_ids = nids,
+        space_separated_tags = BACKLOGTAG
+    ).run_in_background()
 
 
 logger.debug('Adding menus')
@@ -65,5 +72,5 @@ menus = [
 ]
 for m in menus:
     action = QAction(m[0], mw)
-    qconnect(action.triggered, m[1])
+    aqt.utils.qconnect(action.triggered, m[1])
     mw.form.menuTools.addAction(action)
